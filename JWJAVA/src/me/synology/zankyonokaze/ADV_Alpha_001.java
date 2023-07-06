@@ -2,7 +2,7 @@ package me.synology.zankyonokaze;
 
 import java.util.Scanner;
 
-public class ADV_Aplha_001 {
+public class ADV_Alpha_001 {
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {

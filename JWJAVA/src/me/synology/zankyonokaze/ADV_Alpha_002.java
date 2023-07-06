@@ -16,11 +16,11 @@ import javax.swing.JTextArea;	//載入文字顯示區域API
 import javax.swing.JScrollPane;
 
 
-public class ADV_Aplha_002 {
+public class ADV_Alpha_002 {
     private static JFrame frame;
     private static JTextArea textArea;
     private static JButton button;
-    private static JPanel TitleTextPanel, StoryTextPanel, ButtonPanel;
+    private static JPanel gamepanel;
     private static Font WindowFont = new Font("Times New Roman", Font.PLAIN, 24);	//視窗字體設定
     private static Font titleFont = new Font("Times New Roman", Font.PLAIN, 90);	//標題字體設定
     private static Font normalFont = new Font("Times New Roman", Font.PLAIN, 28);	//一般字體設定
@@ -50,7 +50,7 @@ public class ADV_Aplha_002 {
         frame.getContentPane().add(button, BorderLayout.SOUTH);
         
 
-        StoryTextPanel = new JPanel() {
+        gamepanel = new JPanel() {
 	    @Override
 	    protected void paintComponent(Graphics g) {
 	    	super.paintComponent(g);
@@ -62,7 +62,7 @@ public class ADV_Aplha_002 {
 	        }
 	    }
     };
-    frame.getContentPane().add(StoryTextPanel, BorderLayout.CENTER);
+    frame.getContentPane().add(gamepanel, BorderLayout.CENTER);
     frame.setVisible(true);	//顯示視窗 Display the window.
 	}
     
