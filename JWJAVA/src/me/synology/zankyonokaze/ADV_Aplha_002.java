@@ -1,23 +1,26 @@
 package me.synology.zankyonokaze;
 
 
+import java.awt.*;
+import java.io.*;
+import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.io.*;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;	//載入視窗按鈕API
 import javax.swing.JFrame;	//載入視窗框架API
 import javax.swing.JPanel;
 import javax.swing.JTextArea;	//載入文字顯示區域API
+import javax.swing.JScrollPane;
 
 
 public class ADV_Aplha_002 {
     private static JFrame frame;
     private static JTextArea textArea;
     private static JButton button;
-    private static JPanel GamePanel;
+    private static JPanel TitleTextPanel, StoryTextPanel, ButtonPanel;
     private static Font WindowFont = new Font("Times New Roman", Font.PLAIN, 24);	//視窗字體設定
     private static Font titleFont = new Font("Times New Roman", Font.PLAIN, 90);	//標題字體設定
     private static Font normalFont = new Font("Times New Roman", Font.PLAIN, 28);	//一般字體設定
@@ -41,10 +44,13 @@ public class ADV_Aplha_002 {
             startGame();
             button.setEnabled(false);
         });
+        
+        
+        frame.getContentPane().add(textArea, BorderLayout.NORTH);
         frame.getContentPane().add(button, BorderLayout.SOUTH);
+        
 
-
-    GamePanel = new JPanel() {
+        StoryTextPanel = new JPanel() {
 	    @Override
 	    protected void paintComponent(Graphics g) {
 	    	super.paintComponent(g);
@@ -56,8 +62,8 @@ public class ADV_Aplha_002 {
 	        }
 	    }
     };
-    frame.getContentPane().add(GamePanel, BorderLayout.CENTER);
-    frame.setVisible(true);	//顯示視窗 
+    frame.getContentPane().add(StoryTextPanel, BorderLayout.CENTER);
+    frame.setVisible(true);	//顯示視窗 Display the window.
 	}
     
     
@@ -79,9 +85,11 @@ public class ADV_Aplha_002 {
             textArea.append("你決定不打開門。遊戲結束。\n");
             button.setEnabled(false);
         });
+        
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BorderLayout());        
         frame.getContentPane().add(noButton, BorderLayout.EAST);
         frame.getContentPane().add(yesButton, BorderLayout.WEST);
-        frame.getContentPane().add(textArea, BorderLayout.CENTER);
       
 
         frame.revalidate();
