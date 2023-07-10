@@ -4,10 +4,6 @@ package me.synology.zankyonokaze;
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
-import java.awt.BorderLayout;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Image;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;	//載入視窗按鈕API
 import javax.swing.JFrame;	//載入視窗框架API
@@ -32,7 +28,7 @@ public class ADV_Alpha_002 {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setFont(normalFont);	//字體
         frame.setSize(800, 600);	//視窗解析度
-        frame.setResizable(false); //固定視窗大小 使用戶無法調整大小
+        frame.setResizable(false); //固定視窗大小 使用戶無法調整大小      
 
         textArea = new JTextArea();
         textArea.setEditable(false);

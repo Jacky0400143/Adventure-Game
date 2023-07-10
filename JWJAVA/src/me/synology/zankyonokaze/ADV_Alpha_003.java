@@ -1,10 +1,9 @@
 package me.synology.zankyonokaze;
 
 
-import java.awt.*;
 import java.io.*;
-import javax.swing.*;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -13,19 +12,18 @@ import javax.swing.JButton;	//載入視窗按鈕API
 import javax.swing.JFrame;	//載入視窗框架API
 import javax.swing.JPanel;
 import javax.swing.JTextArea;	//載入文字顯示區域API
-import javax.swing.JScrollPane;
-import javax.swing.JOptionPane;
+import javax.swing.JOptionPane;	//載入選項視窗API
 
 
-public class ADV_Alpha_003 {
-    private static JFrame frame;
-    private static JTextArea textArea;
-    private static JButton button;
+public class ADV_Alpha_003 extends JFrame {
+    private static JFrame GameFrame; //引用JFrame並命名為GameFrame
+    private static JTextArea textArea;	//文本顯示位置
+    private static JButton button;	//	按鍵
     private static JPanel TitleTextPanel, StoryTextPanel, ButtonPanel;
     private static Font WindowFont = new Font("Times New Roman", Font.PLAIN, 24);	//視窗字體設定
     private static Font titleFont = new Font("Times New Roman", Font.PLAIN, 90);	//標題字體設定
     private static Font normalFont = new Font("Times New Roman", Font.PLAIN, 28);	//一般字體設定
-    private static String PlayerName;
+    private static String PlayerName; //玩家遊戲名稱
 
     
     public void showInputDialog() {
@@ -43,15 +41,19 @@ public class ADV_Alpha_003 {
     
     public static void main(String[] args) {
 
-        frame = new JFrame("文字冒險遊戲");	//視窗標題
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setFont(normalFont);	//字體
-        frame.setSize(800, 600);	//視窗解析度
-        frame.setResizable(false); //固定視窗大小 使用戶無法調整大小
+    	ADV_Alpha_003 PlayerWindow = new ADV_Alpha_003();
+    	PlayerWindow .showInputDialog();
+        GameFrame = new JFrame("文字冒險遊戲");	//視窗標題
+        GameFrame.setSize(1280, 720);	//視窗解析度
+        GameFrame.setResizable(false);	//固定視窗大小 使用戶無法調整大小
+        GameFrame.setFont(normalFont);	//字體
+        GameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	//結束視窗時，終止程序
+//        GameFrame.getContentPane().setBackground(Color.black);
 
         textArea = new JTextArea();
         textArea.setEditable(false);
-        frame.getContentPane().add(textArea);
+//        textArea.setBackground(Color.BLACK);	//可以更換文本顯示區域的背景顏色
+        GameFrame.getContentPane().add(textArea);
 
         button = new JButton("START");
 //        button.setFont(titleFont);
@@ -61,8 +63,8 @@ public class ADV_Alpha_003 {
         });
         
         
-        frame.getContentPane().add(textArea, BorderLayout.NORTH);
-        frame.getContentPane().add(button, BorderLayout.SOUTH);
+        GameFrame.getContentPane().add(textArea, BorderLayout.NORTH);
+        GameFrame.getContentPane().add(button, BorderLayout.SOUTH);
         
 
         StoryTextPanel = new JPanel() {
@@ -77,13 +79,13 @@ public class ADV_Alpha_003 {
 	        }
 	    }
     };
-    frame.getContentPane().add(StoryTextPanel, BorderLayout.CENTER);
-    frame.setVisible(true);	//顯示視窗 Display the window.
+    GameFrame.getContentPane().add(StoryTextPanel, BorderLayout.CENTER);
+    GameFrame.setVisible(true);	//顯示視窗 Display the window.
 	}
     
     
     private static void startGame() {
-        textArea.setText("你現在在一個房間裡。有一扇門在你面前。\n");
+        textArea.setText("你發現你在一個房間裡醒來。有一扇門在你面前。\n");
         textArea.append("你想要打開門嗎？(是/否)\n");
 
        JButton yesButton = new JButton("是");
@@ -103,12 +105,12 @@ public class ADV_Alpha_003 {
         
         JPanel ButtonPanel = new JPanel();
         ButtonPanel.setLayout(new BorderLayout());        
-        frame.getContentPane().add(noButton, BorderLayout.EAST);
-        frame.getContentPane().add(yesButton, BorderLayout.WEST);
+        GameFrame.getContentPane().add(noButton, BorderLayout.EAST);
+        GameFrame.getContentPane().add(yesButton, BorderLayout.WEST);
       
 
-        frame.revalidate();
-        frame.repaint();
+        GameFrame.revalidate();
+        GameFrame.repaint();
     }
 }
 
