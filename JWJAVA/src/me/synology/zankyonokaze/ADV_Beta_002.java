@@ -29,14 +29,16 @@ import javax.swing.SwingUtilities;
 		Container GameContainer; // 宣告一個Container物件名稱為GameContainer，這將是主視窗中的容器，用於保存和管理其他GUI組件。
 		JPanel TitleNamePanel, StartGButtonPanel, LoadGButtonPanel, ScoreLButtonPanel, ExtraButtonPanel,
 				MainStoryPanel, ChoiceButtonPanel ,PrologueDialoguePanel ,PlayerPanel;
-		JLabel TitleNameLabel, PrologueDialogue;
+		JLabel TitleNameLabel, PrologueDialogue, GameTimeLabel,GameTimeLabelNumer, ItemLabel, ItemLabelName;
 		Font TitleFont = new Font("Ink Free", Font.BOLD, 100);	//開始標題的字體
 		Font NormalBFont = new Font("微軟正黑體", Font.PLAIN, 24);	//開始按鈕的字體
-		JButton StartGameButton, LoadGameButton, ScoreListButton, ExtraButton, NextButton,
+		JButton StartGameButton, LoadGameButton, ScoreListButton, ExtraButton,
 				Choice1, Choice2, Choice3, Choice4;
 		JTextArea MainStoryArea;
 		
+		
 		TitleScreenProcess TSProcess = new TitleScreenProcess();
+		
 		
 	    private int PrologueDialogueIndex = 0;
 	    private String[] PrologueDialogues = {
@@ -45,6 +47,9 @@ import javax.swing.SwingUtilities;
 	            "這裡是哪裡..."
 	    };
 		
+	    private String PlayerItem;
+	    
+	    
 		public static void main(String[] args) { // Java主程式的進入點。
 			
 			new ADV_Beta_002(); // 建立ADV_Beta_001類別的一個新實例，這將自動調用下面的建構子並開啟視窗。
@@ -53,7 +58,7 @@ import javax.swing.SwingUtilities;
 		
 		public ADV_Beta_002() { // ADV_Beta_001類別的建構子。
 			
-			GameWindow = new JFrame(); // 建立一個新的JFrame物件並分配給GameWindow。
+			GameWindow = new JFrame("E s c a p e Ver.B02"); // 建立一個新的JFrame物件並分配給GameWindow。
 			GameWindow.setSize(1280, 720); // 設置GameWindow的解析度
 			GameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 設定視窗關閉行為，當視窗關閉時，應用程式將完全終止。
 			GameWindow.getContentPane().setBackground(Color.black); // 將視窗的背景色設為黑色。
@@ -80,6 +85,7 @@ import javax.swing.SwingUtilities;
 			StartGameButton.setForeground(Color.white);
 			StartGameButton.setFont(NormalBFont);
 			StartGameButton.addActionListener(TSProcess);	//開始遊戲點擊的動作處理程序
+			StartGameButton.setFocusPainted(false);	//關掉被選取的按鍵的強調外框
 						
 			LoadGButtonPanel = new JPanel();	//讀取按鈕的背景面板
 			LoadGButtonPanel.setBounds(550, 420, 200, 70);
@@ -88,6 +94,7 @@ import javax.swing.SwingUtilities;
 			LoadGameButton.setBackground(Color.black);
 			LoadGameButton.setForeground(Color.white);
 			LoadGameButton.setFont(NormalBFont);
+			LoadGameButton.setFocusPainted(false);	//關掉被選取的按鍵的強調外框
 						
 			ScoreLButtonPanel = new JPanel();	//計分按鈕的背景面板
 			ScoreLButtonPanel.setBounds(550, 490, 200, 70);
@@ -96,6 +103,7 @@ import javax.swing.SwingUtilities;
 			ScoreListButton.setBackground(Color.black);
 			ScoreListButton.setForeground(Color.white);
 			ScoreListButton.setFont(NormalBFont);
+			ScoreListButton.setFocusPainted(false);	//關掉被選取的按鍵的強調外框
 			
 			ExtraButtonPanel = new JPanel();	//Extra按鈕的背景面板
 			ExtraButtonPanel.setBounds(550, 560, 200, 70);
@@ -104,6 +112,7 @@ import javax.swing.SwingUtilities;
 			ExtraButton.setBackground(Color.black);
 			ExtraButton.setForeground(Color.white);
 			ExtraButton.setFont(NormalBFont);
+			ExtraButton.setFocusPainted(false);	//關掉被選取的按鍵的強調外框
 			
 			
 			TitleNamePanel.add(TitleNameLabel);	//把標題文字框加入到標題背景面板
@@ -113,7 +122,7 @@ import javax.swing.SwingUtilities;
 			ExtraButtonPanel.add(ExtraButton);	//Extra資訊按鈕加入到Extra面板
 			
 			
-			TitleNamePanel.setOpaque(false);
+			TitleNamePanel.setOpaque(false);	//讓Panel背景可以變成透明化
 			StartGButtonPanel.setOpaque(false);
 			LoadGButtonPanel.setOpaque(false);
 			ScoreLButtonPanel.setOpaque(false);
@@ -168,7 +177,7 @@ import javax.swing.SwingUtilities;
 		}
 		
 		
-		public void CreateGameScreen() {
+		public void CreateGameScreen() {	//創建遊戲主要故事介面
 			
 			TitleNamePanel.setVisible(false);
 			StartGButtonPanel.setVisible(false);
@@ -189,6 +198,7 @@ import javax.swing.SwingUtilities;
 			MainStoryArea.setForeground(Color.white);
 			MainStoryArea.setFont(NormalBFont);
 			MainStoryArea.setLineWrap(true);
+			MainStoryArea.setEditable(false);
 			MainStoryPanel.add(MainStoryArea);
 			
 			
@@ -202,29 +212,96 @@ import javax.swing.SwingUtilities;
 			Choice1.setBackground(Color.black);
 			Choice1.setForeground(Color.white);
 			Choice1.setFont(NormalBFont);
+			Choice1.setFocusPainted(false);	//關掉被選取的按鍵的強調外框
 			ChoiceButtonPanel.add(Choice1);
 			
 			Choice2 = new JButton("Choice 2");
 			Choice2.setBackground(Color.black);
 			Choice2.setForeground(Color.white);
 			Choice2.setFont(NormalBFont);
+			Choice2.setFocusPainted(false);	//關掉被選取的按鍵的強調外框
 			ChoiceButtonPanel.add(Choice2);
 			
 			Choice3 = new JButton("Choice 3");
 			Choice3.setBackground(Color.black);
 			Choice3.setForeground(Color.white);
 			Choice3.setFont(NormalBFont);
+			Choice3.setFocusPainted(false);	//關掉被選取的按鍵的強調外框
 			ChoiceButtonPanel.add(Choice3);
 			
 			Choice4 = new JButton("Choice 4");
 			Choice4.setBackground(Color.black);
 			Choice4.setForeground(Color.white);
 			Choice4.setFont(NormalBFont);
+			Choice4.setFocusPainted(false);	//關掉被選取的按鍵的強調外框
 			ChoiceButtonPanel.add(Choice4);
 			
 			
 			PlayerPanel = new JPanel();
-			PlayerPanel.setBounds(140, 100, 500, 50);
+			PlayerPanel.setBounds(140, 50, 500, 50);
+			PlayerPanel.setBackground(Color.red);
+			PlayerPanel.setLayout(new GridLayout(1,4));
+			GameContainer.add(PlayerPanel);
+			GameTimeLabel = new JLabel("Test");
+			GameTimeLabel.setFont(NormalBFont);
+			GameTimeLabel.setForeground(Color.white);
+			PlayerPanel.add(GameTimeLabel);
+			
+			ItemLabel = new JLabel("道具：");
+			ItemLabel.setFont(NormalBFont);
+			ItemLabel.setForeground(Color.white);
+			PlayerPanel.add(ItemLabel);
+			ItemLabelName = new JLabel();
+			ItemLabelName.setFont(NormalBFont);
+			ItemLabelName.setForeground(Color.white);
+			PlayerPanel.add(ItemLabelName);
+			
+			PlayerSetup();	//當創建CreateGameScreen後自動調用PalyerSetup
+			
+		}
+		
+		
+		public void PlayerSetup() {
+			PlayerItem = "None";	//玩家目前持有的道具
+			ItemLabelName.setText(PlayerItem);	//調用玩家道具的顯示內容
+			
+			ClassRoom();
+		}
+		
+		
+		public void ClassRoom() {
+			MainStoryArea.setText("你正在平常上課熟悉的教室裡，你似乎趴在電腦桌上睡著了。你想要...");	
+		
+			
+			Choice1.setText("環顧四周");
+			Choice2.setText("嘗試開門");
+			Choice3.setText("嘗試開窗");
+			Choice4.setText("繼續睡覺...");
+			
+		}
+		
+		
+		public void LookAround() {
+			MainStoryArea.setText("空無一人的教室，冷氣有點冷，還是趕快回家吧...");
+			
+			
+			Choice1.setText(">>>");
+			Choice2.setText("");
+			Choice3.setText("");
+			Choice4.setText("");
+			
+		}
+		
+		
+		public void TryWindow() {
+			MainStoryArea.setText("空無一人的教室，冷氣有點冷，還是趕快回家吧...");
+			
+			
+			Choice1.setText(">>>");
+			Choice2.setText("");
+			Choice3.setText("");
+			Choice4.setText("");
+			
 		}
 		
 		
