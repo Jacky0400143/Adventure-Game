@@ -18,11 +18,14 @@ import java.awt.event.MouseEvent;
 import javax.swing.JFrame; //導入javax.swing.JFrame類別，此類別代表一個應用程式視窗，用於添加其他GUI組件。
 import javax.swing.JPanel;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+
+import javax.imageio.ImageIO;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -30,7 +33,10 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 	
 
 	
@@ -39,22 +45,30 @@ import java.io.IOException;
 		
 		JFrame GameWindow; // 宣告一個JFrame物件名稱為GameWindow，這將是遊戲的主視窗。
 		Container GameContainer; // 宣告一個Container物件名稱為GameContainer，這將是主視窗中的容器，用於保存和管理其他GUI組件。
-		JPanel TitleNamePanel, StartGButtonPanel, LoadGButtonPanel, ScoreLButtonPanel, ExtraButtonPanel,
-				MainStoryPanel, ChoiceButtonPanel ,PrologueDialoguePanel ,PlayerPanel;
-		JLabel TitleNameLabel, PrologueDialogue, GameTimeLabel,GameTimeLabelNumer, ItemLabel, ItemLabelName;
+		JPanel TitleNamePanel, StartGButtonPanel, LoadTitlePanel, LoadGButtonPanel, ScoreLButtonPanel, ExtraButtonPanel,
+				MainStoryPanel, ChoiceButtonPanel, PrologueDialoguePanel, PlayerPanel, GoodEndPanel, BadEndPanel,
+				EndChoiceButtonPanel, BackgroundPanel;
+		JLabel TitleNameLabel, BackgroundLabel, LoadTitleLabel, PrologueDialogue, GameTimeLabel, GameTimeLabelNumer,
+				ItemLabel, ItemLabelName, BadEndLabel;
 		Font TitleFont = new Font("Ink Free", Font.BOLD, 100);	//開始標題的字體
-		Font TitleBFont = new Font("Times New Roman", Font.ITALIC, 30);
+		Font TitleBFont = new Font("Times New Roman", Font.ITALIC, 30);	//標題按鈕的字體
 		Font NormalBFont = new Font("標楷體", Font.PLAIN, 24);	//介面的字體
 		Font NormalSFont = new Font("微軟正黑體", Font.PLAIN,22);	//故事的字體
 		JButton StartGameButton, LoadGameButton, ScoreListButton, ExtraButton,
 				Choice1, Choice2, Choice3, Choice4;
-		JTextArea MainStoryArea;
+		JTextArea MainStoryArea, GoodEndArea, BadEndArea;
 		
 		
-		TitleScreenProcess TSProcess = new TitleScreenProcess();
+		TitleScreenStartProcess TSProcess = new TitleScreenStartProcess();
+		TitleScreenLoadGProcess TSLGProcess = new TitleScreenLoadGProcess();
+		
 		ChoiceProcess CProcess = new ChoiceProcess();
+		EndScreenProcess ENDProcess = new EndScreenProcess();
 		
 		
+	    private List<JPanel> allPanels;  // 全域變數，儲存所有的 JPanel		
+		
+	    
 	    private int PrologueDialogueIndex = 0;
 	    private String[] PrologueDialogues = {
 	            "咦？我好像睡著了...",
@@ -63,8 +77,20 @@ import java.io.IOException;
 	    };
 		
 	    private String PlayerItem, Position;
-	    
-	    
+
+//	    private void BackgroundPanel = new JPanel() {
+//	    @Override
+//	    protected void paintComponent(Graphics g) {
+//	    	super.paintComponent(g);
+//	    	try {
+//	            Image backgroundImage = ImageIO.read(new File("dir1/Background/01.png"));
+//	            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+//	        } catch (IOException e) {
+//	            e.printStackTrace();
+//	        }
+//	    };
+//	   }
+
 	    class BackgroundImagePanel extends JPanel {	//待研究，導入背景圖片
 	    	
 	        private Image img;
@@ -91,7 +117,33 @@ import java.io.IOException;
 	    }
 	    
 	    
-	    private Clip clip;	//待研究，導入BGM的播放模組
+	    class ItemImagePanel extends JPanel {	//待研究，導入背景圖片
+	    	
+	        private Image img;
+	        public ItemImagePanel(String imgPath) {
+	            this(new ImageIcon(imgPath).getImage());
+	        }
+
+	        public ItemImagePanel(Image img) {
+	            this.img = img;
+	            Dimension size = new Dimension(img.getWidth(null), img.getHeight(null));
+	            setPreferredSize(size);
+	            setMinimumSize(size);
+	            setMaximumSize(size);
+	            setSize(size);
+	            setLayout(null);
+	        }
+
+	        @Override
+	        public void paintComponent(Graphics g) {
+	            super.paintComponent(g);
+//	            g.drawImage(img, 0, 0, getWidth(), getHeight(), null); //根據圖片檔案解析度進行調整
+	            g.drawImage(img, 640, 160, null);	//不進行圖片解析度調整，須注意圖檔解析度大小	            
+	        }
+	    }
+	    
+	    
+	    private Clip clip;	//待研究，導入BGM的播放模組，有問題	// Clip object to hold current music
 	    
 	    public void playMusic(String filePath) {
 	    	
@@ -103,7 +155,10 @@ import java.io.IOException;
 	            }
 
 	            // Open the audio file
-	            AudioInputStream audioIn = AudioSystem.getAudioInputStream(getClass().getResource(filePath));
+	           
+	            AudioInputStream audioIn = AudioSystem.getAudioInputStream(getClass().getResource("/" + filePath));
+//	            AudioInputStream audioIn = AudioSystem.getAudioInputStream(new File(C:\\Users\\Wang\\git\\JW-Adventure-Game-01\\JWJAVA\\dir1\\BGM\\MainMusicV2.wav));
+
 
 	            // Get a sound clip resource.
 	            clip = AudioSystem.getClip();
@@ -138,6 +193,44 @@ import java.io.IOException;
 			GameContainer = GameWindow.getContentPane(); // 將GameWindow的內容窗格分配給GameContainer，現在你可以在這個容器中添加其他組件。
 			
 			
+			CreatTitleScreen();
+			
+		}
+			public void CreateGameInterface() {	//管理所有的Panel
+				
+//			    TitleNamePanel = new JPanel();
+//				StartGButtonPanel = new JPanel();
+//				LoadGButtonPanel = new JPanel();
+//				ScoreLButtonPanel = new JPanel();
+//				ExtraButtonPanel = new JPanel();
+//				PrologueDialoguePanel = new JPanel();
+//				MainStoryPanel = new JPanel();
+//				ChoiceButtonPanel = new JPanel();
+//				PlayerPanel = new JPanel();
+//				BadEndPanel = new JPanel();
+//				GoodEndPanel = new JPanel();
+//				EndChoiceButtonPanel = new JPanel();
+				
+				// 將所有的 JPanel 加入全域變數 allPanels
+			    allPanels = Arrays.asList(
+			        TitleNamePanel, StartGButtonPanel, LoadGButtonPanel,
+			        ScoreLButtonPanel, ExtraButtonPanel, PrologueDialoguePanel,
+			        MainStoryPanel, ChoiceButtonPanel, PlayerPanel
+			        
+			    );
+			}
+			
+			
+			public void CreatTitleScreen() {	//創建標題畫面
+			
+//			BadEndPanel.setVisible(false);
+//			EndChoiceButtonPanel.setVisible(false);
+	    
+			
+//			playMusic("/dir1/BGM/MainMusicV2.wav");	//有問題，無法正確播放背景音樂，會導致遊戲無法正常運作
+				
+//			BackgroundLabel = new BackgroundImagePanel("dir1/Background/BG000-MainBG.jpg");		    
+		    
 			TitleNamePanel = new JPanel();	//標題的背景面板
 			TitleNamePanel.setBounds(340, 100, 600, 150);
 			TitleNamePanel.setBackground(Color.black);
@@ -162,6 +255,7 @@ import java.io.IOException;
 			LoadGameButton.setBackground(Color.black);
 			LoadGameButton.setForeground(Color.white);
 			LoadGameButton.setFont(TitleBFont);
+			LoadGameButton.addActionListener(TSLGProcess);	//讀取按鈕點擊的動作處理程序
 			LoadGameButton.setFocusPainted(false);	//關掉被選取的按鍵的強調外框
 						
 			ScoreLButtonPanel = new JPanel();	//計分按鈕的背景面板
@@ -203,15 +297,21 @@ import java.io.IOException;
 			ExtraButton.setContentAreaFilled(false);	
 			
 			
+//			GameContainer.add(BackgroundLabel);
 			GameContainer.add(TitleNamePanel);
 			GameContainer.add(StartGButtonPanel);
 			GameContainer.add(LoadGButtonPanel);
 			GameContainer.add(ScoreLButtonPanel);
 			GameContainer.add(ExtraButtonPanel);
+			
+			
+			GameWindow.validate();	//讓新添加的元件可以立即在 GUI 上顯示，進行刷新，解決原本開啟遊戲後沒有畫面，還需要縮小視窗的問題
+			GameWindow.repaint();
 
 			
 		}
 
+			
 		public void CreatStoryPrologueScreen() {	//這一段需要再研究原理，主要是一個序幕對話，透過滑鼠點擊
 			
 			TitleNamePanel.setVisible(false);
@@ -228,7 +328,7 @@ import java.io.IOException;
 		    
 		    PrologueDialogue = new JLabel("", SwingConstants.CENTER);
 		    PrologueDialogue.setForeground(Color.green);
-		    PrologueDialogue.setFont(new Font("Serif", Font.PLAIN, 24));
+		    PrologueDialogue.setFont(new Font("標楷體", Font.PLAIN, 24));
 		    PrologueDialoguePanel.add(PrologueDialogue, BorderLayout.CENTER);
 
 		    PrologueDialoguePanel.addMouseListener(new MouseAdapter() {
@@ -408,6 +508,29 @@ import java.io.IOException;
 			
 		}
 		
+		
+				public void FineKeyATCDoor() {
+					
+				    if (MainStoryPanel != null) {	//檢查 MainStoryPanel 是否存在，如果存在，從 GameContainer 中移除它。
+				        GameContainer.remove(MainStoryPanel);
+				    }
+				    
+				    			
+					Position = "FineKeyATCDoor";			
+					MainStoryArea.setText("你找到了一把鑰匙!!!");
+				    MainStoryPanel = new BackgroundImagePanel("dir1/Background/I001-Key.jpg");
+				    GameContainer.add(MainStoryPanel);	//將新的 MainStoryPanel 加入 GameContainer
+				    GameContainer.revalidate();	//確保 UI 更新
+				    GameContainer.repaint();			
+					
+					Choice1.setText(">>>");
+					Choice2.setText("");
+					Choice3.setText("");
+					Choice4.setText("");
+					
+				}
+		
+		
 		public void TryCWindow() {
 
 			Position = "TryCWindow";	
@@ -426,7 +549,7 @@ import java.io.IOException;
 					MainStoryArea.setText("if I can Fly. \n你掉了下去");
 					
 					
-					Choice1.setText("");
+					Choice1.setText("繼續");
 					Choice2.setText("");
 					Choice3.setText("");
 					Choice4.setText("");
@@ -439,13 +562,251 @@ import java.io.IOException;
 			MainStoryArea.setText("還是繼續睡吧... \n你決定繼續睡覺，希望醒來時一切都是夢。");
 			
 			
-			Choice1.setText("");
+			Choice1.setText("繼續");
 			Choice2.setText("");
 			Choice3.setText("");
 			Choice4.setText("");
 			
 		}
-		public class TitleScreenProcess implements ActionListener {	//負責處理點選開始遊戲後，程式執行進入點
+		
+		
+		public void CreateBadEndScreen() {	//創建遊戲壞結局介面
+
+			Position = "CreateBadEndScreen";
+			
+			
+//			GameContainer.remove(TitleNamePanel);
+//			GameContainer.remove(StartGButtonPanel);
+//			GameContainer.remove(LoadGButtonPanel);
+//			GameContainer.remove(ScoreLButtonPanel);
+//			GameContainer.remove(ExtraButtonPanel);
+//			GameContainer.remove(PrologueDialoguePanel);
+			//GameContainer.remove(MainStoryPanel);
+//			MainStoryPanel.setVisible(false);
+//			System.out.println("OK");
+//			GameContainer.remove(ChoiceButtonPanel);
+//
+//			GameContainer.remove(PlayerPanel);
+			
+			JOptionPane.showConfirmDialog(this,
+				     "遊戲結束藍方勝利 " , "Game Over",
+				     JOptionPane.YES_NO_OPTION);
+			
+			GameWindow.validate();	//讓新添加的元件可以立即在 GUI 上顯示，進行刷新
+			GameWindow.repaint();			
+			
+			
+//		    for (JPanel panel : allPanels) {
+//		        panel.setVisible(false);
+//		        GameContainer.remove(panel);
+//		    }
+		    
+		    
+		    // 新的程式碼，創建一個顯示"Bad Ending"的面板
+
+			
+			BadEndPanel = new JPanel();	//標題的背景面板
+			BadEndPanel.setBounds(340, 100, 600, 150);
+			BadEndPanel.setBackground(Color.black);
+			BadEndLabel = new JLabel("B A D E N D");	//標題的文字顯示框
+			BadEndLabel.setForeground(Color.red);
+			BadEndLabel.setFont(TitleFont);
+			GameContainer.add(BadEndPanel);	// 將結束面板添加到GameContainer並設定為可見			
+			
+//			BadEndPanel = new JPanel();
+//			BadEndPanel.setBounds(140, 470, 1000, 150);
+//			BadEndPanel.setBackground(Color.gray);
+//			GameContainer.add(BadEndPanel);	// 將結束面板添加到GameContainer並設定為可見
+			
+//			BadEndArea = new JTextArea("<html><center><font size='5'>壞結局</font><br>這是你的旅程的結束。<br>很不幸，這並不是一個快樂的結局。</center></html>");
+//			BadEndArea.setBounds(140, 100, 1000, 250);
+//			BadEndArea.setBackground(Color.black);
+//			BadEndArea.setForeground(Color.white);
+//			BadEndArea.setFont(NormalSFont);
+//			BadEndArea.setLineWrap(true);
+//			BadEndArea.setEditable(false);
+//			BadEndPanel.add(BadEndArea);
+			
+			
+			EndChoiceButtonPanel = new JPanel();
+			EndChoiceButtonPanel.setBounds(170, 635, 900, 40);
+			EndChoiceButtonPanel.setBackground(Color.black);
+			EndChoiceButtonPanel.setLayout(new GridLayout(1, 1));
+			GameContainer.add(EndChoiceButtonPanel);
+			
+			Choice1 = new JButton("回到遊戲選單");
+			Choice1.setBackground(Color.black);
+			Choice1.setForeground(Color.white);
+			Choice1.setFont(NormalBFont);
+			Choice1.addActionListener(ENDProcess);	//處理對話選項相對應的劇情與位置
+			Choice1.setActionCommand("CB1");	//讓程式可以區分不同的選項按鈕
+			Choice1.setFocusPainted(false);	//關掉被選取的按鍵的強調外框
+			EndChoiceButtonPanel.add(Choice1);		
+			
+			
+//		    JPanel BadEndPanel = new JPanel();
+//		    JLabel BadEndArea = new JLabel("<html><center><font size='5'>壞結局</font><br>這是你的旅程的結束。<br>很不幸，這並不是一個快樂的結局。</center></html>");
+//		    badEndLabel.setHorizontalAlignment(JLabel.CENTER);
+//		    badEndPanel.add(badEndLabel);
+		    
+		    // 如果你有一個結束的圖片，你也可以像這樣使用它
+		    // badEndPanel = new BackgroundImagePanel("dir1/Background/BadEnd.jpg");
+
+		    // 創建一個返回主選單的按鈕
+//		    JButton mainMenuButton = new JButton("回到主選單");
+//		    mainMenuButton.addActionListener(new ActionListener() {
+//		        public void actionPerformed(ActionEvent e) {
+//		            // 在這裡添加回到主選單的程式碼
+//		            // 你可能需要重新創建和顯示主選單的面板
+//		        }
+//		    });
+//		    BadEndPanel.add(mainMenuButton);
+
+		    
+		    BadEndPanel.setVisible(true);
+		    GameContainer.revalidate();
+		    GameContainer.repaint();
+					
+		}
+		
+		
+		public void CreateGoodEndScreen() {	//創建遊戲好結局介面
+
+			TitleNamePanel.setVisible(false);
+			StartGButtonPanel.setVisible(false);
+			LoadGButtonPanel.setVisible(false);
+			ScoreLButtonPanel.setVisible(false);
+			ExtraButtonPanel.setVisible(false);
+			PrologueDialoguePanel.setVisible(false);
+			MainStoryPanel.setVisible(false);
+			ChoiceButtonPanel.setVisible(false);
+			PlayerPanel.setVisible(false);
+
+			
+		    if (MainStoryPanel != null) {	//檢查 MainStoryPanel 是否存在，如果存在，從 GameContainer 中移除它。
+		        GameContainer.remove(MainStoryPanel);
+		    }
+		    
+		    
+		    // 新的程式碼，創建一個顯示"Bad Ending"的面板
+			
+		    GoodEndPanel = new JPanel();
+		    GoodEndPanel.setBounds(140, 470, 1000, 150);
+		    GoodEndPanel.setBackground(Color.gray);
+			GameContainer.add(GoodEndPanel);	// 將結束面板添加到GameContainer並設定為可見
+			
+			GoodEndArea = new JTextArea("恭喜!!");
+			GoodEndArea.setBounds(140, 100, 1000, 250);
+			GoodEndArea.setBackground(Color.black);
+			GoodEndArea.setForeground(Color.white);
+			GoodEndArea.setFont(NormalSFont);
+			GoodEndArea.setLineWrap(true);
+			GoodEndArea.setEditable(false);
+			GoodEndArea.add(BadEndArea);
+			
+			
+			EndChoiceButtonPanel = new JPanel();
+			EndChoiceButtonPanel.setBounds(170, 635, 900, 40);
+			EndChoiceButtonPanel.setBackground(Color.black);
+			EndChoiceButtonPanel.setLayout(new GridLayout(1, 1));
+			GameContainer.add(EndChoiceButtonPanel);
+			
+			Choice1 = new JButton("回到遊戲選單");
+			Choice1.setBackground(Color.black);
+			Choice1.setForeground(Color.white);
+			Choice1.setFont(NormalBFont);
+			Choice1.addActionListener(ENDProcess);	//處理對話選項相對應的劇情與位置
+			Choice1.setActionCommand("CB1");	//讓程式可以區分不同的選項按鈕
+			Choice1.setFocusPainted(false);	//關掉被選取的按鍵的強調外框
+			EndChoiceButtonPanel.add(Choice1);		
+
+		    
+			GoodEndPanel.setVisible(true);
+		    GameContainer.revalidate();
+		    GameContainer.repaint();
+					
+		}
+		
+		
+		public void CreateLoadGameScreen() {	//創建遊戲紀錄介面	
+
+			TitleNamePanel.setVisible(false);
+			StartGButtonPanel.setVisible(false);
+			LoadGButtonPanel.setVisible(false);
+			ScoreLButtonPanel.setVisible(false);
+			ExtraButtonPanel.setVisible(false);
+			
+			
+			LoadTitlePanel = new JPanel();
+			LoadTitlePanel.setBounds(220, 100, 800, 150);
+			LoadTitlePanel.setBackground(Color.black);
+			LoadTitleLabel = new JLabel("L O A D  G A M E");	//標題的文字顯示框
+			LoadTitleLabel.setForeground(Color.white);
+			LoadTitleLabel.setFont(TitleFont);
+			LoadTitlePanel.add(LoadTitleLabel);	//把標題文字框加入到標題背景面板
+			GameContainer.add(LoadTitlePanel);					
+			
+			
+			ChoiceButtonPanel = new JPanel();
+			ChoiceButtonPanel.setBounds(170, 300, 900, 300);
+			ChoiceButtonPanel.setBackground(Color.black);
+			ChoiceButtonPanel.setLayout(new GridLayout(2, 2));
+			GameContainer.add(ChoiceButtonPanel);
+			
+			Choice1 = new JButton("SAVE 1");
+			Choice1.setBackground(Color.black);
+			Choice1.setForeground(Color.white);
+			Choice1.setFont(NormalBFont);
+			Choice1.addActionListener(CProcess);	//處理對話選項相對應的劇情與位置
+			Choice1.setActionCommand("");	//讓程式可以區分不同的選項按鈕
+			Choice1.setFocusPainted(false);	//關掉被選取的按鍵的強調外框
+			ChoiceButtonPanel.add(Choice1);
+			
+			Choice2 = new JButton("SAVE 2");
+			Choice2.setBackground(Color.black);
+			Choice2.setForeground(Color.white);
+			Choice2.setFont(NormalBFont);
+			Choice2.addActionListener(CProcess);	//處理對話選項相對應的劇情與位置
+			Choice2.setActionCommand("");	//讓程式可以區分不同的選項按鈕
+			Choice2.setFocusPainted(false);	//關掉被選取的按鍵的強調外框
+			ChoiceButtonPanel.add(Choice2);
+			
+			Choice3 = new JButton("SAVE 3");
+			Choice3.setBackground(Color.black);
+			Choice3.setForeground(Color.white);
+			Choice3.setFont(NormalBFont);
+			Choice3.addActionListener(CProcess);	//處理對話選項相對應的劇情與位置
+			Choice3.setActionCommand("");	//讓程式可以區分不同的選項按鈕
+			Choice3.setFocusPainted(false);	//關掉被選取的按鍵的強調外框
+			ChoiceButtonPanel.add(Choice3);
+			
+			Choice4 = new JButton("回到遊戲選單");
+			Choice4.setBackground(Color.black);
+			Choice4.setForeground(Color.white);
+			Choice4.setFont(NormalBFont);
+			Choice4.addActionListener(ENDProcess);	//處理對話選項相對應的劇情與位置
+//			Choice4.setActionCommand("");	//讓程式可以區分不同的選項按鈕
+			Choice4.setFocusPainted(false);	//關掉被選取的按鍵的強調外框
+			ChoiceButtonPanel.add(Choice4);							
+
+			
+			GameWindow.validate();	//讓新添加的元件可以立即在 GUI 上顯示，進行刷新，解決原本開啟遊戲後沒有畫面，還需要縮小視窗的問題
+			GameWindow.repaint();
+			
+		}				
+		
+		
+		public void CreateScoreListScreen() {	//創建遊戲計分介面	
+			
+		}
+		
+		
+		public void CreateExtraScreen() {	//創建遊戲額外內容介面	
+			
+		}
+		
+		
+		public class TitleScreenStartProcess implements ActionListener {	//負責處理點選開始遊戲後，程式執行進入點
 			
 			public void actionPerformed(ActionEvent event) {
 				
@@ -453,6 +814,23 @@ import java.io.IOException;
 			}
 		}
 		
+		
+		public class TitleScreenLoadGProcess implements ActionListener {	//負責處理點選讀取遊戲後，程式執行進入點
+			
+			public void actionPerformed(ActionEvent event) {
+				
+				CreateLoadGameScreen();
+			}
+		}
+		
+		
+		public class EndScreenProcess implements ActionListener {	//負責處理點選結束遊戲後，程式回到標題畫面的進入點
+			
+			public void actionPerformed(ActionEvent event) {
+				
+				CreatTitleScreen();
+			}
+		}
 		
 		public class ChoiceProcess implements ActionListener {	//負責處理四個對話選項的程式執行進入點
 			
@@ -466,7 +844,7 @@ import java.io.IOException;
 					case "CB1":LookAroundCRoom(); break;
 					case "CB2":TryCDoor(); break;
 					case "CB3":TryCWindow(); break;
-					case "CB4":LookAroundCRoom(); break;
+					case "CB4":GoSleep(); break;
 					}
 					break;
 					
@@ -479,8 +857,15 @@ import java.io.IOException;
 						case "TryCDoor":
 							switch(PlayerChoice) {
 							case "CB1": ClassRoom(); break;
+							case "CB2": FineKeyATCDoor(); break;
 							}
 							break;
+							
+								case "FineKeyATCDoor":
+									switch(PlayerChoice) {
+									case "CB1": CreateBadEndScreen(); break;
+									}
+									break;
 							
 						case "TryCWindow":
 							switch(PlayerChoice) {
@@ -488,43 +873,22 @@ import java.io.IOException;
 							case "CB2": ClassRoom(); break;
 							}
 							break;
+							
+								case "ForceOpenWindow":
+									switch(PlayerChoice) {
+									case "CB1":
+										
+										CreateBadEndScreen(); break;
+									}
+									break;
+								
 						case "GoSleep":
 							switch(PlayerChoice) {
-							case "CB1": ClassRoom(); break;
+							case "CB1": CreateBadEndScreen(); break;
 							}
 							break;
 							
 				}
 			}
-		}
-		
-		
-		public void CreateBadEndScreen() {	//創建遊戲壞結局介面
-
-			TitleNamePanel.setVisible(false);
-			StartGButtonPanel.setVisible(false);
-			LoadGButtonPanel.setVisible(false);
-			ScoreLButtonPanel.setVisible(false);
-			ExtraButtonPanel.setVisible(false);
-			PrologueDialoguePanel.setVisible(false);
-			MainStoryPanel.setVisible(false);
-			ChoiceButtonPanel.setVisible(false);
-			PlayerPanel.setVisible(false);
-			
-		}
-		
-		
-		public void CreateGoodEndScreen() {	//創建遊戲好結局介面
-			
-			TitleNamePanel.setVisible(false);
-			StartGButtonPanel.setVisible(false);
-			LoadGButtonPanel.setVisible(false);
-			ScoreLButtonPanel.setVisible(false);
-			ExtraButtonPanel.setVisible(false);
-			PrologueDialoguePanel.setVisible(false);
-			MainStoryPanel.setVisible(false);
-			ChoiceButtonPanel.setVisible(false);
-			PlayerPanel.setVisible(false);
-			
 		}
 	}
