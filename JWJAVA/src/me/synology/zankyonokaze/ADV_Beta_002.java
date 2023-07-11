@@ -455,7 +455,7 @@ import java.util.List;
 			
 			
 			MainStoryArea.setText("你正在平常上課熟悉的教室裡，你似乎趴在電腦桌上睡著了。\n你想要...");	
-		    MainStoryPanel = new BackgroundImagePanel("dir1/Background/BG001-ClassRoom.jpg");
+//		    MainStoryPanel = new BackgroundImagePanel("dir1/Background/BG001-ClassRoom.jpg");
 		    GameContainer.add(MainStoryPanel);	//將新的 MainStoryPanel 加入 GameContainer
 		    GameContainer.revalidate();	//確保 UI 更新
 		    GameContainer.repaint();		
@@ -499,7 +499,7 @@ import java.util.List;
 		    			
 			Position = "TryCDoor";			
 			MainStoryArea.setText("奇怪，教室門被反鎖了 \n找找看有什麼辦法打開吧");
-		    MainStoryPanel = new BackgroundImagePanel("dir1/Background/BG002-ClassDoor.jpg");
+//		    MainStoryPanel = new BackgroundImagePanel("dir1/Background/BG002-ClassDoor.jpg");
 		    GameContainer.add(MainStoryPanel);	//將新的 MainStoryPanel 加入 GameContainer
 		    GameContainer.revalidate();	//確保 UI 更新
 		    GameContainer.repaint();			
@@ -521,7 +521,7 @@ import java.util.List;
 				    			
 					Position = "FineKeyATCDoor";			
 					MainStoryArea.setText("你找到了一把鑰匙!!!");
-				    MainStoryPanel = new BackgroundImagePanel("dir1/Background/I001-Key.jpg");
+//				    MainStoryPanel = new BackgroundImagePanel("dir1/Background/I001-Key.jpg");
 				    GameContainer.add(MainStoryPanel);	//將新的 MainStoryPanel 加入 GameContainer
 				    GameContainer.revalidate();	//確保 UI 更新
 				    GameContainer.repaint();			
