@@ -229,7 +229,8 @@ import java.util.List;
 			
 //			playMusic("/dir1/BGM/MainMusicV2.wav");	//有問題，無法正確播放背景音樂，會導致遊戲無法正常運作
 				
-//			BackgroundLabel = new BackgroundImagePanel("dir1/Background/BG000-MainBG.jpg");		    
+//			BackgroundPanel = new BackgroundImagePanel("dir1/Background/BG000-MainBG.jpg");	
+//			GameContainer.add(BackgroundPanel);
 		    
 			TitleNamePanel = new JPanel();	//標題的背景面板
 			TitleNamePanel.setBounds(340, 100, 600, 150);
@@ -297,7 +298,7 @@ import java.util.List;
 			ExtraButton.setContentAreaFilled(false);	
 			
 			
-//			GameContainer.add(BackgroundLabel);
+
 			GameContainer.add(TitleNamePanel);
 			GameContainer.add(StartGButtonPanel);
 			GameContainer.add(LoadGButtonPanel);
@@ -454,8 +455,10 @@ import java.util.List;
 			
 			
 			MainStoryArea.setText("你正在平常上課熟悉的教室裡，你似乎趴在電腦桌上睡著了。\n你想要...");	
-		    MainStoryPanel = new BackgroundImagePanel("dir1/Background/ClassRoom.jpg");
-		    
+		    MainStoryPanel = new BackgroundImagePanel("dir1/Background/BG001-ClassRoom.jpg");
+		    GameContainer.add(MainStoryPanel);	//將新的 MainStoryPanel 加入 GameContainer
+		    GameContainer.revalidate();	//確保 UI 更新
+		    GameContainer.repaint();		
 		    
 			Choice1.setText("環顧四周");
 			Choice2.setText("嘗試開門");
@@ -475,7 +478,7 @@ import java.util.List;
 			
 			
 			MainStoryArea.setText("空無一人的教室裡，只有你獨自一人。\n冷氣顯得有點冷 \n還是趕快回家吧...");
-		    MainStoryPanel = new BackgroundImagePanel("dir1/Background/LookAroundCRoom.jpg");
+		    MainStoryPanel = new BackgroundImagePanel("dir1/Background/BG003-ClassWindow.jpg");
 		    GameContainer.add(MainStoryPanel);	//將新的 MainStoryPanel 加入 GameContainer
 		    GameContainer.revalidate();	//確保 UI 更新
 		    GameContainer.repaint();
@@ -496,7 +499,7 @@ import java.util.List;
 		    			
 			Position = "TryCDoor";			
 			MainStoryArea.setText("奇怪，教室門被反鎖了 \n找找看有什麼辦法打開吧");
-		    MainStoryPanel = new BackgroundImagePanel("dir1/Background/TryCDoor.jpg");
+		    MainStoryPanel = new BackgroundImagePanel("dir1/Background/BG002-ClassDoor.jpg");
 		    GameContainer.add(MainStoryPanel);	//將新的 MainStoryPanel 加入 GameContainer
 		    GameContainer.revalidate();	//確保 UI 更新
 		    GameContainer.repaint();			
@@ -535,6 +538,10 @@ import java.util.List;
 
 			Position = "TryCWindow";	
 			MainStoryArea.setText("這裡是十八樓耶，別傻了...");
+		    MainStoryPanel = new BackgroundImagePanel ("dir1/Background/BG004-ClassWindowOut.jpg");
+		    GameContainer.add(MainStoryPanel);	//將新的 MainStoryPanel 加入 GameContainer
+		    GameContainer.revalidate();	//確保 UI 更新
+		    GameContainer.repaint();			
 			
 			
 			Choice1.setText("仍執意要打開");
@@ -574,6 +581,9 @@ import java.util.List;
 
 			Position = "CreateBadEndScreen";
 			
+			BackgroundPanel = new BackgroundImagePanel("dir1/Background/BG000-MainBG.jpg");	
+			GameContainer.add(BackgroundPanel);			
+			
 			
 //			GameContainer.remove(TitleNamePanel);
 //			GameContainer.remove(StartGButtonPanel);
@@ -588,9 +598,10 @@ import java.util.List;
 //
 //			GameContainer.remove(PlayerPanel);
 			
-			JOptionPane.showConfirmDialog(this,
-				     "遊戲結束藍方勝利 " , "Game Over",
-				     JOptionPane.YES_NO_OPTION);
+//			JOptionPane.showConfirmDialog(this,
+//				     "遊戲結束藍方勝利 " , "Game Over",
+//				     JOptionPane.YES_NO_OPTION);
+			
 			
 			GameWindow.validate();	//讓新添加的元件可以立即在 GUI 上顯示，進行刷新
 			GameWindow.repaint();			
@@ -877,7 +888,6 @@ import java.util.List;
 								case "ForceOpenWindow":
 									switch(PlayerChoice) {
 									case "CB1":
-										
 										CreateBadEndScreen(); break;
 									}
 									break;
